@@ -1,0 +1,79 @@
+<!-- TODO list:
+  If replacing chart, replace ticker symbol.
+  Set up charts side by side.
+  use correct rules for PnF
+  Dynamic chart width? - determine after writing correct algorithms
+  New canvas only draw on show then hide debugger window.
+  Rearrange for Backbone?  Meteor?
+-->
+
+<html>
+<head>
+  <title>Point and Figure</title>
+  <script data-main="./scripts/main.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js"></script>
+  <script src="./bootstrap/js/bootstrap.min.js"></script>
+  <link href='http://fonts.googleapis.com/css?family=Actor' rel='stylesheet' type='text/css'>
+  <link src="./bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link src="./bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+  <style type="text/css" src="style/style.css"></style>
+</head>
+
+<body>
+  <div class="container-main span12">
+
+    <div class="row span12">
+      <div class="span3" id="titleBox">
+        <h2>The Point and Figure</h2>
+        <div id="moreData">
+        </div>
+        <br/>
+        <h6>Company name:</h6>
+        <h6>Date of incorporation:</h6>
+        <h6>Other information:</h6>
+        <h6>Other information:</h6>
+        <h6>Other information:</h6>
+        <h6>Other information:</h6>
+        <h6>Other information:</h6>
+        <h6>Other information:</h6>
+        <h6>Other information:</h6>
+        <h6>Other information:</h6>
+        <h6>Other information:</h6>
+      </div>
+      <div class="span8">
+        <div class="row span11" id="buttonBox">
+          <div class="btn-group pull-right">
+            <a class="btn dropdown-toggle btn-inverse" data-toggle="dropdown" href="#">
+              Sectors
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+              <li class="divider"></li>
+              <li><a tabindex="-1" href="#">Separated link</a></li>
+            </ul>
+          </div>
+          <div class="btn-group pull-right">
+            <a class="btn dropdown-toggle btn-inverse" data-toggle="dropdown" href="#">
+              Trending
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+              <li class="dropdown-submenu">
+                <a tabindex="-1" href="#">List of ten? most selected stocks?</a>
+              </li>
+              <li class="divider"></li>
+              <li><a tabindex="-1" href="#">Separated link</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="span11" id="chartBox">Chart Box<br/>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- End class="container-main span12" -->
+</body>
+</html>
