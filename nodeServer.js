@@ -44,7 +44,6 @@ var requestListener = function (req, res) {
     var parsedURL = url.parse(req.url, true);
     req.on("data", function (chunk){
       var data = querystring.parse(chunk.toString());
-			console.log(Object.keys(data));
       // TODO if time of request after market close, use today's date, else use yesterday's date.
 			var chartReq = "http://ichart.yahoo.com/table.csv?s=" + Object.keys(data)[0] + getDateRange() + "&g=d&ignore=.csv";
       var chartData = "Not undefined";
