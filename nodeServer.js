@@ -44,9 +44,11 @@ var requestListener = function (req, res) {
     var parsedURL = url.parse(req.url, true);
     req.on("data", function (chunk){
       var data = querystring.parse(chunk.toString());
+			console.log(Object.keys(data));
       // TODO if time of request after market close, use today's date, else use yesterday's date.
+			var chartReq = "http://ichart.yahoo.com/table.csv?s=" + Object.keys(data)[0] + getDateRange() + "&g=d&ignore=.csv";
       var chartData = "Not undefined";
-      request(chartReq, function(err, response, body){
+      request(chartReq, function(err, response, body) {
         var stockArray = body.split(",").slice(10).filter(function (val, key){
           return (key % 6) === 0;
         }).map(function (val, key){
@@ -60,17 +62,17 @@ var requestListener = function (req, res) {
     var cssString = fs.readFileSync("assets/style/style.css", "utf8", function(err, data) {
       return err ? console.log(err) : data;
     });
-    // var jsString = fs.readFileSync("script.js", "utf8", function (err, data){
-    //   return err ? console.log(err) : data;
-    // });
+    var jsString = fs.readFileSync("assets/scripts/script.js", "utf8", function(err, data) {
+      return err ? console.log(err) : data;
+    });
     var webPage = fs.readFileSync("index.html", "utf8", function (err, data){
       return err ? console.log(err) : data;
     });
-    // var preJS = webPage.replace("cssstylecss", cssString);
-    res.writeHead(200);
-    // res.end(preJS.replace("jsscriptjs", jsString));
-    // res.write(cssString);
-    res.end(webPage)
+		var preJS = webPage.replace("<!--style.css-->", cssString);
+    res.writeHead(200, {'content-type': 'text/html'});
+		res.end(preJS.replace("\/\/script.js", jsString));
+//     res.write(cssString);
+//    res.end(preJS);
   }
 };
 

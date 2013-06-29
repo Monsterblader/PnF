@@ -1,5 +1,5 @@
-define([], function(){
-return {  
+//define([], function(){
+//return {
   var findRange = function (prices){
     var extremes = {high: prices[0], low: prices[0]};
     prices.forEach(function (val){
@@ -16,22 +16,97 @@ return {
       ctx.moveTo(startPoint.x, startPoint.y);
       ctx.lineTo(endPoint.x, endPoint.y);
       ctx.stroke();
-    }
+	};
 
     var makePoint = function (X, Y){
       return {x: X, y: Y};
-    }
+	};
 
     var drawAxes = function (ctx, top, bottom, scale){
-      var labelAxis = function (ctx, priceRange){
-        ctx.font = "12px Times New Roman";
-        ctx.fillStyle = "Black";
-        var high = Math.max(Math.floor(priceRange.high) + 1, 30);
-        var low = Math.min(high - 30, priceRange.low);
-        for (var i = high; i >= low; i -= 1) {
-          ctx.fillText(i, 1, (high - i + 1) * 10);
-        }
-      }
+    var labelAxis = function(ctx, priceRange) {
+			// There are five price increments that are established as part of the definition of point and figure charting.  I have separated the processing of each range into (five) functions.
+			var BREAKPOINTS = [{top: Infinity, bottom: 200, increment: 4},
+				{top: 200, bottom: 100, increment: 2},
+				{top: 100, bottom: 20, increment: 1},
+				{top: 20, bottom: 5, increment: 0.50},
+				{top: 5, bottom: 0, increment: 0.25}];
+			var axisTickCount = function(high, low) {
+				var returnArray = [];
+				for (var i = 0; i < 5; i += 1) {
+					if ((high < BREAKPOINTS[i].top) && (high >= BREAKPOINTS[i].bottom)) {
+						// This determines if the stock's high price exceeds the top boundary.
+						var highValue = Math.min(BREAKPOINTS[i].top / BREAKPOINTS[i].increment + 1, Math.floor(high / BREAKPOINTS[i].increment) + 1);
+						// This determines if the stock's low price exceeds the bottom boundary.
+						var lowValue = Math.max(BREAKPOINTS[i].bottom / BREAKPOINTS[i].increment, Math.floor(low / BREAKPOINTS[i].increment));
+						returnArray.push(highValue - lowValue);
+					} else {
+						returnArray.push(0);
+					}
+				}
+				return returnArray;
+			};
+
+			ctx.font = "12px Times New Roman";
+			ctx.fillStyle = "Black";
+			var totalTicks = axisTickCount(priceRange.high, priceRange.low);
+			var n = totalTicks[0] + totalTicks[1] + totalTicks[2] + totalTicks[3] + totalTicks[4];
+			var paddedHigh;
+			if (n < 30) {
+				n = Math.floor((30 - n) / 2);
+				var splitN;
+				var padHigh = function(index) {
+					var top = BREAKPOINTS[index].top;
+					var increment = BREAKPOINTS[index].increment;
+					if (top - Math.floor(priceRange.high / increment) > n) {
+						totalTicks[index] += n;
+						paddedHigh = (Math.floor(priceRange.high / increment) + 1 + n) * increment;
+					} else {
+						totalTicks[index] += (top / increment) - Math.floor(priceRange.high / increment);
+						splitN = n - ((top / increment) - Math.floor(priceRange.high / increment));
+						totalTicks[index - 1] += splitN
+						paddedHigh = BREAKPOINTS[index - 1].bottom + splitN * BREAKPOINTS[index - 1].increment;
+					}
+				};
+				var padLow = function(index) {
+					var bottom = BREAKPOINTS[index].bottom;
+					var increment = BREAKPOINTS[index].increment;
+					if (Math.floor(priceRange.low / increment) - (bottom / increment) > n) {
+						totalTicks[index] += n;
+					} else {
+						totalTicks[index] += Math.floor(priceRange.low / increment) - (bottom / increment);
+						totalTicks[index + 1] += n - (Math.floor(priceRange.low / increment) - (bottom / increment));
+					}
+				};
+				if (totalTicks[0]) {
+					totalTicks[0] += n;
+					paddedHigh = (Math.floor(priceRange.high / 4) + 1 + n) * 4;
+					padLow(0);
+				} else if (totalTicks[1]) {
+					padHigh(1);
+					padLow(1)
+				} else if (totalTicks[2]) {
+					padHigh(2);
+					padLow(2);
+				} else if (totalTicks[3]) {
+					padHigh(3);
+					padLow(3);
+				} else {
+					totalTicks[3] = 10;
+					paddedHigh = 10;
+					totalTicks[4] = 20;
+				}
+			} else {
+				paddedHigh = Math.floor(priceRange.high);
+			}
+			var axisIndex = 1;
+			for (var i = 0; i < 5; i += 1) {
+				if (totalTicks[i]) {
+					for (var j = totalTicks[i]; j-- > 0; paddedHigh -= BREAKPOINTS[i].increment) {
+						ctx.fillText(paddedHigh, 1, axisIndex++ * 10);
+					}
+				}
+			}
+		};
 
       ctx.clearRect(0,0,300,300);
       // This section taken from http://www.w3schools.com/tags/canvas_fillstyle.asp
@@ -50,9 +125,9 @@ return {
     };
 
     var detectTrend = function (trend, prices, key){
-      var delta = prices[key] - prices[key - 1]; 
+      var delta = prices[key] - prices[key - 1];
       return trend ? delta >= 0 : delta > 0;
-    }
+	};
 
     var drawCol = function (trend, prices, key, ctx, X, Y){
       var shadowStyle = function (ctx, offX, offY, blur, color){
@@ -74,7 +149,7 @@ return {
         ctx.beginPath();
         ctx.arc(X, Y, 5, 0, 2*Math.PI, false);
         ctx.stroke();
-      }
+		};
 
       if (trend) {
         for (var plotIndex = prices[key - 1]; plotIndex <= prices[key]; plotIndex += 1)
@@ -84,7 +159,7 @@ return {
           { drawO(ctx, X, Y += 10); }
       }
       return Y;
-    }
+	};
 
     // todo Y always starts in the center.  Need to write scale to left properly.
     var X = Math.max(25, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 4) * 5),
@@ -102,7 +177,7 @@ return {
       Y = drawCol(trendUp, prices, i, ctx, X, Y);
     };
     ctx.restore();
-  }
+};
 
   var getStockChart = function(){
     var tickerSymb = $("#testBox").val();
@@ -123,6 +198,6 @@ return {
         });
       }
     });
-  }
-}
-})
+};
+//}
+//})

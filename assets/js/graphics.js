@@ -39,11 +39,11 @@ var createChart = function (ctx, prices){
     ctx.moveTo(startPoint.x, startPoint.y);
     ctx.lineTo(endPoint.x, endPoint.y);
     ctx.stroke();
-  }
+  };
 
   var makePoint = function (X, Y){
     return {x: X, y: Y};
-  }
+  };
 
   var drawAxes = function (ctx, top, bottom, scale){
     var labelAxis = function (ctx, priceRange){
@@ -53,26 +53,28 @@ var createChart = function (ctx, prices){
       for (var i = high; i >= priceRange.low; i -= 1) {
         ctx.fillText(i, 1, (high - i + 1) * 10);
       }
-    }
+    };
 
     ctx.clearRect(0,0,300,300);
     // This section taken from http://www.w3schools.com/tags/canvas_fillstyle.asp
     var my_gradient=ctx.createLinearGradient(0,0,0,150);
-    my_gradient.addColorStop(0,"gray");
-    my_gradient.addColorStop(1,"white");
-    ctx.fillStyle=my_gradient;
-    ctx.fillRect(0, 0, 300, 300);
-    // End section
-    ctx.shadowColor = undefined;
-    drawLine(ctx, makePoint(15, 0), makePoint(15, 300), "black");
-    drawLine(ctx, makePoint(0, 150), makePoint(300, 150), "black");
-    labelAxis(ctx, priceRange);
-  };
+    var my_gradient = ctx.createLinearGradient(0, 0, 0, chartHeight / 2);
+		my_gradient.addColorStop(0, "gray");
+		my_gradient.addColorStop(1, "white");
+		ctx.fillStyle = my_gradient;
+		ctx.fillRect(0, 0, 300, chartHeight);
+		// End section
+		ctx.shadowColor = undefined;
+		var axisLeftOffset = Math.max(16, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 2) * 5) + 8;
+		drawLine(ctx, makePoint(axisLeftOffset, 0), makePoint(axisLeftOffset, chartHeight), "black");
+		labelAxis(ctx, priceRange);
+	};
+
 
   var detectTrend = function (trend, prices, key){
-    var delta = prices[key] - prices[key - 1]; 
+    var delta = prices[key] - prices[key - 1];
     return trend ? delta >= 0 : delta > 0;
-  }
+  };
 
   var drawCol = function (trend, prices, key, ctx, X, Y){
     var shadowStyle = function (ctx, offX, offY, blur, color){
@@ -94,7 +96,7 @@ var createChart = function (ctx, prices){
       ctx.beginPath();
       ctx.arc(X, Y, 5, 0, 2*Math.PI, false);
       ctx.stroke();
-    }
+    };
 
     if (trend) {
       for (var plotIndex = prices[key - 1]; plotIndex <= prices[key]; plotIndex += 1)
@@ -104,21 +106,24 @@ var createChart = function (ctx, prices){
         { drawO(ctx, X, Y += 10); }
     }
     return Y;
-  }
+  };
 
   // todo Y always starts in the center.  Need to write scale to left properly.
-  var X = 20, Y = (Math.max(Math.floor(priceRange.high), 30) - Math.floor(prices[0]) + 1) * 10 + 5;
-  var trendUp = (prices[1] - prices[0]) >= 0;
-  drawAxes(ctx);
-  ctx.save();
-  // Need to scale Y (prices[i]) according to price range.
-  Y = drawCol(trendUp, prices, 1, ctx, X, Y);
-  for (var i=2; i < prices.length; i += 1){
-    if (trendUp !== detectTrend(trendUp, prices, i)) {
-      X += 10;
-      trendUp = !trendUp;
-    };
-    Y = drawCol(trendUp, prices, i, ctx, X, Y);
-  };
+  var X = Math.max(32, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 4) * 5 + 7),
+					Y = (Math.max(Math.floor(priceRange.high), 30) - Math.floor(prices[0]) + 1) * 10 + 5;
+	var trendUp = (prices[1] - prices[0]) >= 0;
+	drawAxes(ctx);
+	ctx.save();
+	// Need to scale Y (prices[i]) according to price range.
+	Y = drawCol(trendUp, prices, 1, ctx, X, Y);
+	for (var i = 2; i < prices.length; i += 1) {
+		if (trendUp !== detectTrend(trendUp, prices, i)) {
+			X += 10;
+			trendUp = !trendUp;
+		}
+		;
+		Y = drawCol(trendUp, prices, i, ctx, X, Y);
+	}
+	;
   ctx.restore();
-}
+};
