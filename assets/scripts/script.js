@@ -41,6 +41,7 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 						returnArray.push(0);
 					}
 				}
+				console.log(high, low);
 				return returnArray;
 			};
 
@@ -162,23 +163,25 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 			}
 		}
 		return Y;
-};
+	};
 
 	// todo Y always starts in the center.  Need to write scale to left properly.
 	var X = Math.max(25, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 4) * 5),
-					Y = (Math.max(Math.floor(priceRange.high), 30) - Math.floor(prices[0]) + 1) * 10 + 5;
+	Y = (Math.max(Math.floor(priceRange.high), 30) - Math.floor(prices[0]) + 1) * 10 + 5;
 	var trendUp = (prices[1] - prices[0]) >= 0;
-	drawAxes(ctx);
+	var axisRange = drawAxes(ctx);
 	ctx.save();
+	console.log(prices[0]);
+	// TODO Rewrite this section to properly handle
 	// Need to scale Y (prices[i]) according to price range.
-	Y = drawCol(trendUp, prices, 1, ctx, X, Y);
-	for (var i = 2; i < prices.length; i += 1) {
-		if (trendUp !== detectTrend(trendUp, prices, i)) {
-			X += 10;
-			trendUp = !trendUp;
-		}
-		Y = drawCol(trendUp, prices, i, ctx, X, Y);
-	}
+//	Y = drawCol(trendUp, prices, 1, ctx, X, Y);
+//	for (var i = 2; i < prices.length; i += 1) {
+//		if (trendUp !== detectTrend(trendUp, prices, i)) {
+//			X += 10;
+//			trendUp = !trendUp;
+//		}
+//		Y = drawCol(trendUp, prices, i, ctx, X, Y);
+//	}
 	ctx.restore();
 };
 
@@ -191,13 +194,13 @@ var getStockChart = function(){
 		success: function(data) {
 			var priceRange = findRange(JSON.parse(data));
 			var chartHeight = Math.max(300, (priceRange.high - priceRange.low) * 10);
-			// TODO could remove var chartData when not using in console.log
 			$("#chartContainer").remove();
 			$("#container").append("<div id='chartContainer'><br><div class='chartTitle'>" + tickerSymb.toUpperCase() + "</div>" +
 							"<canvas class='pnfChart' id='" + tickerSymb + "Chart' width='300' height='" + chartHeight + "'></canvas></div>");
 			$("#testBox").val("");
-			var canvas = document.getElementById(tickerSymb + "Chart");
+			var canvas = $("#" + tickerSymb + "Chart")[0];
 			canvas.getContext && webkitRequestAnimationFrame(function() {
+				console.log(JSON.parse(data));
 				createChart(canvas.getContext("2d"), JSON.parse(data), priceRange, chartHeight);
 			});
 		}

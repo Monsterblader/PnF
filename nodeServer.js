@@ -48,11 +48,11 @@ var requestListener = function (req, res) {
 			var chartReq = "http://ichart.yahoo.com/table.csv?s=" + Object.keys(data)[0] + getDateRange() + "&g=d&ignore=.csv";
       var chartData = "Not undefined";
       request(chartReq, function(err, response, body) {
-        var stockArray = body.split(",").slice(10).filter(function (val, key){
-          return (key % 6) === 0;
+        var stockArray = body.split(",").slice(8).filter(function(val, key) {
+          return (((key % 6) === 0) || ((key % 6) === 1));
         }).map(function (val, key){
           return parseFloat(val);
-        });
+        }).reverse();
         res.writeHead(200);
         res.end(JSON.stringify(stockArray));
       });
@@ -70,8 +70,6 @@ var requestListener = function (req, res) {
 		var preJS = webPage.replace("<!--style.css-->", cssString);
     res.writeHead(200, {'content-type': 'text/html'});
 		res.end(preJS.replace("\/\/script.js", jsString));
-//     res.write(cssString);
-//    res.end(preJS);
   }
 };
 
