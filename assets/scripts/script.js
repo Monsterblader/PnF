@@ -7,6 +7,33 @@ var findRange = function (prices){
 	return extremes;
 };
 
+var BREAKPOINTS = [{top: Infinity, bottom: 200, increment: 4},
+	{top: 200, bottom: 100, increment: 2},
+	{top: 100, bottom: 20, increment: 1},
+	{top: 20, bottom: 5, increment: 0.50},
+	{top: 5, bottom: 0, increment: 0.25}];
+
+// TODO This is not calculating the difference properly.  Working for 'T' and 'GOOG' (both one-range charts), but not for 'V' (a two-range chart).
+var PnFDiff = function(minuend, subtrahend) {
+	var returnArray = [];
+	for (var i = 0; i < 5; i += 1) {
+		if (((minuend < BREAKPOINTS[i].top) && (minuend >= BREAKPOINTS[i].bottom)) || ((subtrahend < BREAKPOINTS[i].top) && (subtrahend >= BREAKPOINTS[i].bottom))) {
+			// This determines if the stock's high price exceeds the top boundary.
+			var highValue = Math.min(BREAKPOINTS[i].top / BREAKPOINTS[i].increment + 1, Math.floor(minuend / BREAKPOINTS[i].increment) + 1);
+			// This determines if the stock's low price exceeds the bottom boundary.
+			var lowValue = Math.max(BREAKPOINTS[i].bottom / BREAKPOINTS[i].increment, Math.floor(subtrahend / BREAKPOINTS[i].increment));
+			returnArray.push(highValue - lowValue);
+		} else {
+			returnArray.push(0);
+		}
+	}
+	return returnArray;
+};
+
+var diffRangeSum = function(rangeArray) {
+	return rangeArray[0] + rangeArray[1] + rangeArray[2] + rangeArray[3] + rangeArray[4];
+};
+
 var createChart = function (ctx, prices, priceRange, chartHeight){
 	var drawLine = function(ctx, startPoint, endPoint, lineColor) {
 		ctx.strokeStyle = lineColor;
@@ -23,31 +50,9 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 	var drawAxes = function(ctx, top, bottom, scale) {
 		var labelAxis = function(ctx, priceRange) {
 			// There are five price increments that are established as part of the definition of point and figure charting.  I have separated the processing of each range into (five) functions.
-			var BREAKPOINTS = [{top: Infinity, bottom: 200, increment: 4},
-				{top: 200, bottom: 100, increment: 2},
-				{top: 100, bottom: 20, increment: 1},
-				{top: 20, bottom: 5, increment: 0.50},
-				{top: 5, bottom: 0, increment: 0.25}];
-			var axisTickCount = function(high, low) {
-				var returnArray = [];
-				for (var i = 0; i < 5; i += 1) {
-					if ((high < BREAKPOINTS[i].top) && (high >= BREAKPOINTS[i].bottom)) {
-						// This determines if the stock's high price exceeds the top boundary.
-						var highValue = Math.min(BREAKPOINTS[i].top / BREAKPOINTS[i].increment + 1, Math.floor(high / BREAKPOINTS[i].increment) + 1);
-						// This determines if the stock's low price exceeds the bottom boundary.
-						var lowValue = Math.max(BREAKPOINTS[i].bottom / BREAKPOINTS[i].increment, Math.floor(low / BREAKPOINTS[i].increment));
-						returnArray.push(highValue - lowValue);
-					} else {
-						returnArray.push(0);
-					}
-				}
-				console.log(high, low);
-				return returnArray;
-			};
-
 			ctx.font = "12px Times New Roman";
 			ctx.fillStyle = "Black";
-			var totalTicks = axisTickCount(priceRange.high, priceRange.low);
+			var totalTicks = PnFDiff(priceRange.high, priceRange.low);
 			var n = totalTicks[0] + totalTicks[1] + totalTicks[2] + totalTicks[3] + totalTicks[4];
 			var paddedHigh;
 			if (n < 30) {
@@ -97,6 +102,7 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 			} else {
 				paddedHigh = Math.floor(priceRange.high);
 			}
+			var chartMax = paddedHigh;
 			var axisIndex = 1;
 			for (var i = 0; i < 5; i += 1) {
 				if (totalTicks[i]) {
@@ -105,6 +111,7 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 					}
 				}
 			}
+			return chartMax;
 		};
 
 		ctx.clearRect(0, 0, 300, 300);
@@ -120,16 +127,10 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 		drawLine(ctx, makePoint(axisLeftOffset, 0), makePoint(axisLeftOffset, chartHeight), "black");
 		// Following line is no longer needed?
 		// drawLine(ctx, makePoint(0, 150), makePoint(300, 150), "black");
-		labelAxis(ctx, priceRange);
+		return labelAxis(ctx, priceRange);
 	};
 
-// TODO Does this need to be rewritten?
-	var detectTrend = function(trend, prices, key) {
-		var delta = prices[key] - prices[key - 1];
-		return trend ? delta >= 0 : delta > 0;
-	};
-
-	var drawCol = function(trend, prices, key, ctx, X, Y) {
+	var plotData = function(ctx, high, prices) {
 		var shadowStyle = function(ctx, offX, offY, blur, color) {
 			ctx.shadowOffsetX = offX;
 			ctx.shadowOffsetY = offY;
@@ -151,27 +152,19 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 			ctx.stroke();
 		};
 
-		if (trend) {
-			for (var plotIndex = prices[key - 1]; plotIndex <= prices[key]; plotIndex += 1)
-			{
-				drawX(ctx, X, Y -= 10);
-			}
-		} else {
-			for (var plotIndex = prices[key - 1]; plotIndex >= prices[key]; plotIndex -= 1)
-			{
-				drawO(ctx, X, Y += 10);
-			}
+		var drawFunction = prices[1] - prices[0] < 0 ? drawO : drawX;
+		for (var i = diffRangeSum(PnFDiff(high, prices[3])); i <= diffRangeSum(PnFDiff(high, prices[2])); i += 1) {
+			drawFunction(ctx, 27.5, i * 10 - 2.5);
 		}
-		return Y;
 	};
-
 	// todo Y always starts in the center.  Need to write scale to left properly.
 	var X = Math.max(25, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 4) * 5),
 	Y = (Math.max(Math.floor(priceRange.high), 30) - Math.floor(prices[0]) + 1) * 10 + 5;
 	var trendUp = (prices[1] - prices[0]) >= 0;
-	var axisRange = drawAxes(ctx);
+	var chartMax = drawAxes(ctx);
 	ctx.save();
-	console.log(prices[0]);
+	console.log(prices);
+	plotData(ctx, chartMax, prices);
 	// TODO Rewrite this section to properly handle
 	// Need to scale Y (prices[i]) according to price range.
 //	Y = drawCol(trendUp, prices, 1, ctx, X, Y);
@@ -193,14 +186,13 @@ var getStockChart = function(){
 		data: tickerSymb,
 		success: function(data) {
 			var priceRange = findRange(JSON.parse(data));
-			var chartHeight = Math.max(300, (priceRange.high - priceRange.low) * 10);
+			var chartHeight = Math.max(300, Math.min(30, diffRangeSum(PnFDiff(priceRange.high, priceRange.low))) * 10);
 			$("#chartContainer").remove();
 			$("#container").append("<div id='chartContainer'><br><div class='chartTitle'>" + tickerSymb.toUpperCase() + "</div>" +
 							"<canvas class='pnfChart' id='" + tickerSymb + "Chart' width='300' height='" + chartHeight + "'></canvas></div>");
 			$("#testBox").val("");
 			var canvas = $("#" + tickerSymb + "Chart")[0];
 			canvas.getContext && webkitRequestAnimationFrame(function() {
-				console.log(JSON.parse(data));
 				createChart(canvas.getContext("2d"), JSON.parse(data), priceRange, chartHeight);
 			});
 		}

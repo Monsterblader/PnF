@@ -48,11 +48,19 @@ var requestListener = function (req, res) {
 			var chartReq = "http://ichart.yahoo.com/table.csv?s=" + Object.keys(data)[0] + getDateRange() + "&g=d&ignore=.csv";
       var chartData = "Not undefined";
       request(chartReq, function(err, response, body) {
-        var stockArray = body.split(",").slice(8).filter(function(val, key) {
+				var stockPrices = body.split(",");
+				// The following section takes the historic stock-price data from
+				// Yahoo! and converts it to an array with the contents:
+				// [opening price for first day of range, closing price for same,
+				//  high and low prices for all days to last day of range]
+        var stockArray = stockPrices.slice(8).filter(function(val, key) {
           return (((key % 6) === 0) || ((key % 6) === 1));
         }).map(function (val, key){
           return parseFloat(val);
         }).reverse();
+				stockArray.unshift(stockPrices[stockPrices.length - 3]);
+				stockArray.unshift(stockPrices[stockPrices.length - 6]);
+				// End of section.
         res.writeHead(200);
         res.end(JSON.stringify(stockArray));
       });
