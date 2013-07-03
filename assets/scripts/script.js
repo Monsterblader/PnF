@@ -61,7 +61,7 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 				var padHigh = function(index) {
 					var top = BREAKPOINTS[index].top;
 					var increment = BREAKPOINTS[index].increment;
-					if (top - Math.floor(priceRange.high / increment) > n) {
+					if ((top - Math.floor(priceRange.high)) / increment > n) {
 						totalTicks[index] += n;
 						paddedHigh = (Math.floor(priceRange.high / increment) + 1 + n) * increment;
 					} else {
@@ -153,7 +153,8 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 		};
 
 		var drawFunction = prices[1] - prices[0] < 0 ? drawO : drawX;
-		for (var i = diffRangeSum(PnFDiff(high, prices[3])); i <= diffRangeSum(PnFDiff(high, prices[2])); i += 1) {
+		console.log(high, prices[3]);
+		for (var i = diffRangeSum(PnFDiff(high, prices[3])), j = diffRangeSum(PnFDiff(high, prices[2])); i <= j; i += 1) {
 			drawFunction(ctx, 27.5, i * 10 - 2.5);
 		}
 	};
@@ -165,16 +166,6 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 	ctx.save();
 	console.log(prices);
 	plotData(ctx, chartMax, prices);
-	// TODO Rewrite this section to properly handle
-	// Need to scale Y (prices[i]) according to price range.
-//	Y = drawCol(trendUp, prices, 1, ctx, X, Y);
-//	for (var i = 2; i < prices.length; i += 1) {
-//		if (trendUp !== detectTrend(trendUp, prices, i)) {
-//			X += 10;
-//			trendUp = !trendUp;
-//		}
-//		Y = drawCol(trendUp, prices, i, ctx, X, Y);
-//	}
 	ctx.restore();
 };
 
