@@ -19,7 +19,7 @@ var PnFDiff = function(minuend, subtrahend) {
 	for (var i = 0; i < 5; i += 1) {
 		if (((minuend < BREAKPOINTS[i].top) && (minuend >= BREAKPOINTS[i].bottom)) || ((subtrahend < BREAKPOINTS[i].top) && (subtrahend >= BREAKPOINTS[i].bottom))) {
 			// This determines if the stock's high price exceeds the top boundary.
-			var highValue = Math.min(BREAKPOINTS[i].top / BREAKPOINTS[i].increment + 1, Math.floor(minuend / BREAKPOINTS[i].increment) + 1);
+			var highValue = Math.min(BREAKPOINTS[i].top / BREAKPOINTS[i].increment, Math.floor(minuend / BREAKPOINTS[i].increment) + 1);
 			// This determines if the stock's low price exceeds the bottom boundary.
 			var lowValue = Math.max(BREAKPOINTS[i].bottom / BREAKPOINTS[i].increment, Math.floor(subtrahend / BREAKPOINTS[i].increment));
 			returnArray.push(highValue - lowValue);
@@ -153,7 +153,6 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 		};
 
 		var drawFunction = prices[1] - prices[0] < 0 ? drawO : drawX;
-		console.log(high, prices[3]);
 		for (var i = diffRangeSum(PnFDiff(high, prices[3])), j = diffRangeSum(PnFDiff(high, prices[2])); i <= j; i += 1) {
 			drawFunction(ctx, 27.5, i * 10 - 2.5);
 		}
@@ -165,6 +164,7 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 	var chartMax = drawAxes(ctx);
 	ctx.save();
 	console.log(prices);
+	debugger;
 	plotData(ctx, chartMax, prices);
 	ctx.restore();
 };
