@@ -13,7 +13,7 @@ var BREAKPOINTS = [{top: Infinity, bottom: 200, increment: 4},
 	{top: 20, bottom: 5, increment: 0.50},
 	{top: 5, bottom: 0, increment: 0.25}];
 
-// TODO This is not calculating the difference properly.  Working for 'T' and 'GOOG' (both one-range charts), but not for 'V' (a two-range chart).
+// TODO Keep an eye on this.  Removed '+ 1' from 'var highValue...'  Works for 'V' (range - 178-216), 'GOOG' (range - 700+), and 'T' (range - 34).  Haven't tested for others.
 var PnFDiff = function(minuend, subtrahend) {
 	var returnArray = [];
 	for (var i = 0; i < 5; i += 1) {
@@ -123,10 +123,8 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 		ctx.fillRect(0, 0, 300, chartHeight);
 		// End section
 		ctx.shadowColor = undefined;
-		var axisLeftOffset = Math.max(16, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 2) * 5) + 1;
+		var axisLeftOffset = priceRange.low < 20 ? 22.5 : Math.max(16, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 2) * 5) + 1;
 		drawLine(ctx, makePoint(axisLeftOffset, 0), makePoint(axisLeftOffset, chartHeight), "black");
-		// Following line is no longer needed?
-		// drawLine(ctx, makePoint(0, 150), makePoint(300, 150), "black");
 		return labelAxis(ctx, priceRange);
 	};
 
@@ -152,19 +150,28 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 			ctx.stroke();
 		};
 
-		var drawFunction = prices[1] - prices[0] < 0 ? drawO : drawX;
-		for (var i = diffRangeSum(PnFDiff(high, prices[3])), j = diffRangeSum(PnFDiff(high, prices[2])); i <= j; i += 1) {
-			drawFunction(ctx, 27.5, i * 10 - 2.5);
+		var trendDown = prices[1] - prices[0] < 0;
+		var drawFunction = trendDown ? drawO : drawX;
+		var bottomPrice = function(trendDown, price) {
+			if (trendDown) {
+				var i = 0;
+				while (price < BREAKPOINTS[i].bottom) {
+					i += 1;
+				}
+				price = Math.ceil(price / BREAKPOINTS[i].increment) * BREAKPOINTS[i].increment;
+			}
+			return price;
+		};
+		// This sets up the initial column of the chart.
+		for (var i = diffRangeSum(PnFDiff(high, prices[3])), j = diffRangeSum(PnFDiff(high, bottomPrice(trendDown, prices[2]))); i <= j; i += 1) {
+			drawFunction(ctx, 27.5/* TODO need to calculate this value according to the number of digits in the highest price*/, i * 10 - 2.5);
 		}
+		// TODO Need to rewrite the following for statement, anyway, to incorporate the entire contents of prices[].
+
 	};
-	// todo Y always starts in the center.  Need to write scale to left properly.
-	var X = Math.max(25, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 4) * 5),
-	Y = (Math.max(Math.floor(priceRange.high), 30) - Math.floor(prices[0]) + 1) * 10 + 5;
-	var trendUp = (prices[1] - prices[0]) >= 0;
 	var chartMax = drawAxes(ctx);
 	ctx.save();
 	console.log(prices);
-	debugger;
 	plotData(ctx, chartMax, prices);
 	ctx.restore();
 };
