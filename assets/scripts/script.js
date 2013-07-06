@@ -77,7 +77,6 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 					if (Math.floor(priceRange.low / increment) - (bottom / increment) > n) {
 						totalTicks[index] += n;
 					} else {
-						totalTicks[index] += Math.floor(priceRange.low / increment) - (bottom / increment);
 						totalTicks[index + 1] += n - (Math.floor(priceRange.low / increment) - (bottom / increment));
 					}
 				};
@@ -111,6 +110,8 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 					}
 				}
 			}
+			var axisLeftOffset = priceRange.low < 20 ? 22.5 : Math.max(16, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 2) * 5) + 1;
+			drawLine(ctx, makePoint(axisLeftOffset, 0), makePoint(axisLeftOffset, chartHeight), "black");
 			return chartMax;
 		};
 
@@ -123,8 +124,6 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 		ctx.fillRect(0, 0, 300, chartHeight);
 		// End section
 		ctx.shadowColor = undefined;
-		var axisLeftOffset = priceRange.low < 20 ? 22.5 : Math.max(16, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 2) * 5) + 1;
-		drawLine(ctx, makePoint(axisLeftOffset, 0), makePoint(axisLeftOffset, chartHeight), "black");
 		return labelAxis(ctx, priceRange);
 	};
 
@@ -163,11 +162,16 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 			return price;
 		};
 		// This sets up the initial column of the chart.
+		var axisLeftOffset = priceRange.low < 20 ? 27.5 : Math.max(16, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 3.5) * 5) + 1;
 		for (var i = diffRangeSum(PnFDiff(high, prices[3])), j = diffRangeSum(PnFDiff(high, bottomPrice(trendDown, prices[2]))); i <= j; i += 1) {
-			drawFunction(ctx, 27.5/* TODO need to calculate this value according to the number of digits in the highest price*/, i * 10 - 2.5);
+			drawFunction(ctx, axisLeftOffset, i * 10 - 5);
 		}
 		// TODO Need to rewrite the following for statement, anyway, to incorporate the entire contents of prices[].
-
+		// get next column
+		// if continues existing trend, draw additional information.
+		// else if reverses existing trend by three ticks,
+		// increment column and draw three ticks.
+		// repeat.
 	};
 	var chartMax = drawAxes(ctx);
 	ctx.save();
