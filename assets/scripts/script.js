@@ -74,10 +74,12 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 				var padLow = function(index) {
 					var bottom = BREAKPOINTS[index].bottom;
 					var increment = BREAKPOINTS[index].increment;
-					if (Math.floor(priceRange.low / increment) - (bottom / increment) > n) {
+					var pricetoBottom = Math.floor(priceRange.low / increment) - (bottom / increment);
+					if (pricetoBottom > n) {
 						totalTicks[index] += n;
 					} else {
-						totalTicks[index + 1] += n - (Math.floor(priceRange.low / increment) - (bottom / increment));
+						totalTicks[index] += pricetoBottom;
+						totalTicks[index + 1] += n - pricetoBottom;
 					}
 				};
 				if (totalTicks[0]) {
@@ -110,9 +112,10 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 					}
 				}
 			}
-			var axisLeftOffset = priceRange.low < 20 ? 22.5 : Math.max(16, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 2) * 5) + 1;
+			debugger;
+			var axisLeftOffset = (totalTicks[3] > 1) || (totalTicks[4] > 1) ? 22.5 : Math.max(16, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 2) * 5) + 1;
 			drawLine(ctx, makePoint(axisLeftOffset, 0), makePoint(axisLeftOffset, chartHeight), "black");
-			return chartMax;
+			return [chartMax, axisLeftOffset];
 		};
 
 		ctx.clearRect(0, 0, 300, 300);
@@ -127,7 +130,7 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 		return labelAxis(ctx, priceRange);
 	};
 
-	var plotData = function(ctx, high, prices) {
+	var plotData = function(ctx, high, prices, axisLeftOffset) {
 		var shadowStyle = function(ctx, offX, offY, blur, color) {
 			ctx.shadowOffsetX = offX;
 			ctx.shadowOffsetY = offY;
@@ -172,19 +175,11 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 		var bottomPrice = PnFCeil(prices[2]);
 		var topPrice = PnFFloor(prices[3]);
 		// This sets up the initial column of the chart.
-		var axisLeftOffset = priceRange.low < 20 ? 27.5 : Math.max(16, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 3.5) * 5) + 1;
+		axisLeftOffset += 7.5;
 		for (var i = diffRangeSum(PnFDiff(high, prices[3])), j = diffRangeSum(PnFDiff(high, bottomPrice)); i <= j; i += 1) {
 			drawFunction(ctx, axisLeftOffset, i * 10 - 5);
 		}
-		// TODO Need to rewrite the following for statement, anyway, to incorporate the entire contents of prices[].
-		// get next column
-		// if continues existing trend, draw additional information.
-		// else if reverses existing trend by three ticks,
-		// increment column and draw three ticks.
-		// repeat.
-		debugger;
 		for (var i = 4, l = prices.length; i < l; i += 2) {
-			console.log(prices[i], prices[i + 1]);
 			if (trendDown) {
 				var newBottom = PnFCeil(prices[i]);
 				if (newBottom < bottomPrice) {
@@ -220,10 +215,9 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 			}
 		}
 	};
-	var chartMax = drawAxes(ctx);
+	var chartData = drawAxes(ctx);
 	ctx.save();
-	console.log(prices);
-	plotData(ctx, chartMax, prices);
+	plotData(ctx, chartData[0], prices, chartData[1]);
 	ctx.restore();
 };
 
