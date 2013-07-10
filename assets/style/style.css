@@ -1,9 +1,12 @@
-/* CSS declarations go here */
 body {
-  background-color: black;  
+  background-color: black;
   /*background: url("../../../pw_maze_black.png");*/
   color: white;
   text-shadow: black 0.2em 0.2em 0.4em;
+  font-family: "Actor", sans-serif;
+  background-image: url( "http://underscorejs.org/docs/images/background.png");
+  /*font-family: "Shadows Into Light", cursive;*/
+  /*color: white;*/
 }
 
 .container-main {
@@ -16,17 +19,13 @@ body {
 }
 
 #titleBox {
-  border: 1px solid black;
-  border-radius: 5px;
   height: 20%;
-  background-color: #741BE0;
-  margin-top: 25px;
 }
 
-#buttonBox {
+#titleBox, #buttonBox {
   border: 1px solid black;
   border-radius: 5px;
-  background-color: #741BE0;
+  background-color: darkgray;
   margin-top: 25px;
 }
 
@@ -45,12 +44,6 @@ body {
   border-radius: 5px;
   background-color: gray;
   margin-top: 25px;
-}
-body {
-  font-family: "Actor", sans-serif;
-  background-image: url( "http://underscorejs.org/docs/images/background.png");
-  /*font-family: "Shadows Into Light", cursive;*/
-  /*color: white;*/
 }
 
 #canvas {

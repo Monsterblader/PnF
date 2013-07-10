@@ -112,7 +112,6 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 					}
 				}
 			}
-			debugger;
 			var axisLeftOffset = (totalTicks[3] > 1) || (totalTicks[4] > 1) ? 22.5 : Math.max(16, (Math.floor(Math.log(priceRange.high) / Math.LN10) + 2) * 5) + 1;
 			drawLine(ctx, makePoint(axisLeftOffset, 0), makePoint(axisLeftOffset, chartHeight), "black");
 			return [chartMax, axisLeftOffset];
