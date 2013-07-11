@@ -4,8 +4,7 @@
   "dependencies": {
     "require": "0.5.x",
     "request": "2.22.x",
-    "url": "0.7.x",
-    "http": "x.x.x"
+    "url": "0.7.x"
   },
   "engines": {
     "node": "0.10.x",
