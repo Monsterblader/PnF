@@ -5,8 +5,7 @@
     "require": "0.5.x",
     "request": "2.22.x",
     "url": "0.7.x",
-    "http": "x.x.x",
-    "fs": "x.x.x"
+    "http": "x.x.x"
   },
   "engines": {
     "node": "0.10.x",
