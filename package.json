@@ -2,7 +2,11 @@
   "name": "Point-and-Figure-exercise",
   "version": "0.1.0",
   "dependencies": {
-    "request": "2.22.x"
+    "require": "0.5.x",
+    "request": "2.22.x",
+    "url": "0.7.x",
+    "http": "x.x.x",
+    "fs": "x.x.x"
   },
   "engines": {
     "node": "0.10.x",
