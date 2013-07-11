@@ -66,15 +66,9 @@ var requestListener = function (req, res) {
       });
     });
   } else {
-    var cssString = fs.readFileSync("assets/style/style.css", "utf8", function(err, data) {
-      return err ? console.log(err) : data;
-    });
-    var jsString = fs.readFileSync("assets/scripts/script.js", "utf8", function(err, data) {
-      return err ? console.log(err) : data;
-    });
-    var webPage = fs.readFileSync("index.html", "utf8", function (err, data){
-      return err ? console.log(err) : data;
-    });
+    var cssString = fs.readFileSync("assets/style/style.css", "utf8", readFSCallback);
+    var jsString = fs.readFileSync("assets/scripts/script.js", "utf8", readFSCallback);
+		var webPage = fs.readFileSync("index.html", "utf8", readFSCallback);
 		var preJS = webPage.replace("<!--style.css-->", cssString);
     res.writeHead(200, {'content-type': 'text/html'});
 		res.end(preJS.replace("\/\/script.js", jsString));
