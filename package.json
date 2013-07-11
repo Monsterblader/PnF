@@ -4,7 +4,8 @@
   "dependencies": {
     "require": "latest",
     "request": "latest",
-    "url": "latest"
+    "url": "latest",
+    "querystring": "latest"
   },
   "engines": {
     "node": "0.10.x",
