@@ -227,16 +227,17 @@ var getStockChart = function(){
 		type: "POST",
 		data: tickerSymb,
 		success: function(data) {
-			var priceRange = findRange(JSON.parse(data));
-			var chartHeight = Math.max(300, Math.min(30, diffRangeSum(PnFDiff(priceRange.high, priceRange.low))) * 10);
-			$("#chartContainer").remove();
-			$("#container").append("<div id='chartContainer'><br><div class='chartTitle'>" + tickerSymb.toUpperCase() + "</div>" +
-							"<canvas class='pnfChart' id='" + tickerSymb + "Chart' width='300' height='" + chartHeight + "'></canvas></div>");
-			$("#testBox").val("");
-			var canvas = $("#" + tickerSymb + "Chart")[0];
-			canvas.getContext && webkitRequestAnimationFrame(function() {
-				createChart(canvas.getContext("2d"), JSON.parse(data), priceRange, chartHeight);
-			});
+			alert(data);
+//			var priceRange = findRange(JSON.parse(data));
+//			var chartHeight = Math.max(300, Math.min(30, diffRangeSum(PnFDiff(priceRange.high, priceRange.low))) * 10);
+//			$("#chartContainer").remove();
+//			$("#container").append("<div id='chartContainer'><br><div class='chartTitle'>" + tickerSymb.toUpperCase() + "</div>" +
+//							"<canvas class='pnfChart' id='" + tickerSymb + "Chart' width='300' height='" + chartHeight + "'></canvas></div>");
+//			$("#testBox").val("");
+//			var canvas = $("#" + tickerSymb + "Chart")[0];
+//			canvas.getContext && webkitRequestAnimationFrame(function() {
+//				createChart(canvas.getContext("2d"), JSON.parse(data), priceRange, chartHeight);
+//			});
 		}
 	});
 };
