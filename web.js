@@ -7,7 +7,7 @@ var app = express();
 app.use(express.logger());
 
 app.get('/', function(request, response) {
-  response.send('<div>Hello World!</div>');
+  response.send('<b>Hello World!</b>');
 });
 
 var port = process.env.PORT || 5000;
