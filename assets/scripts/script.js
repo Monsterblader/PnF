@@ -223,7 +223,7 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 var getStockChart = function(){
 	var tickerSymb = $("#testBox").val();
 	$.ajax({
-		url: "127.0.0.1/stock?" + tickerSymb,
+		url: "stock?" + tickerSymb,
 		type: "POST",
 		data: tickerSymb,
 		success: function(data) {
