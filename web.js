@@ -18,7 +18,7 @@ app.get('/', function(request, response) {
 	response.send(preJS.replace("\/\/script.js", jsString));
 });
 
-app.post("/stock?goog", express.bodyParser(), function(request, response) {
+app.post("/stock?", express.bodyParser(), function(request, response) {
 	console.log("working so far");
 	response.send("Moo to you, too.");
 });

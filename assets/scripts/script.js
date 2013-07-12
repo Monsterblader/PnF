@@ -227,7 +227,7 @@ var getStockChart = function(){
 		type: "POST",
 		data: tickerSymb,
 		success: function(data) {
-			alert(data);
+			console.log(data);
 //			var priceRange = findRange(JSON.parse(data));
 //			var chartHeight = Math.max(300, Math.min(30, diffRangeSum(PnFDiff(priceRange.high, priceRange.low))) * 10);
 //			$("#chartContainer").remove();
