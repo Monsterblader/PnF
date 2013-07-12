@@ -18,6 +18,10 @@ app.get('/', function(request, response) {
 	response.send(preJS.replace("\/\/script.js", jsString));
 });
 
+app.get("/stock?goog", function(request, response) {
+	response.send("Moo to you, too.");
+});
+
 var port = process.env.PORT || 5000;
 app.listen(port, function() {
   console.log("Listening on " + port);
