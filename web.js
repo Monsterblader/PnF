@@ -18,7 +18,7 @@ app.get('/', function(request, response) {
 	response.send(preJS.replace("\/\/script.js", jsString));
 });
 
-app.post("/stock?goog", function(request, response) {
+app.post("stock?goog", function(request, response) {
 	response.send("Moo to you, too.");
 });
 
