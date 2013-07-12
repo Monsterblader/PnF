@@ -6,11 +6,15 @@ var url = require("url");
 var app = express();
 app.use(express.logger());
 
-var cssString = fs.readFileSync("assets/style/style.css", "utf8", readFSCallback);
-var jsString = fs.readFileSync("assets/scripts/script.js", "utf8", readFSCallback);
-var webPage = fs.readFileSync("index.html", "utf8", readFSCallback);
-var preJS = webPage.replace("<!--style.css-->", cssString);
+var readFSCallback = function(err, data) {
+	return err ? console.log(err) : data;
+};
+
 app.get('/', function(request, response) {
+	var cssString = fs.readFileSync("assets/style/style.css", "utf8", readFSCallback);
+	var jsString = fs.readFileSync("assets/scripts/script.js", "utf8", readFSCallback);
+	var webPage = fs.readFileSync("index.html", "utf8", readFSCallback);
+	var preJS = webPage.replace("<!--style.css-->", cssString);
 	response.send(preJS.replace("\/\/script.js", jsString));
 });
 
