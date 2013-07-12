@@ -14,3 +14,16 @@ var port = process.env.PORT || 5000;
 app.listen(port, function() {
   console.log("Listening on " + port);
 });
+
+var requestListener = function(req, res) {
+	if (req.method === "POST") {
+		res.writeHead(200, {'content-type': 'text/html'});
+		res.end("Moo, I say.");
+	} else {
+		res.writeHead(200, {'content-type': 'text/html'});
+		res.end("You say, 'moo.'");
+	}
+};
+
+var server = http.createServer(requestListener);
+server.listen(process.env.PORT || 8080, process.env.IP || "127.0.0.1");
