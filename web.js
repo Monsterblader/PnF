@@ -1,7 +1,5 @@
 var express = require("express");
 var fs = require("fs");
-var http = require("http");
-var url = require("url");
 var request = require("request");
 
 var app = express();
@@ -30,7 +28,7 @@ var readFSCallback = function(err, data) {
 // initial load.
 var initPage = function(req, res) {
 	var cssString = fs.readFileSync("assets/style/style.css", "utf8", readFSCallback);
-	var jsString = fs.readFileSync("assets/scripts/script.js", "utf8", readFSCallback);
+	var jsString = fs.readFileSync("assets/js/script.js", "utf8", readFSCallback);
 	var webPage = fs.readFileSync("index.html", "utf8", readFSCallback);
 	var preJS = webPage.replace("<!--style.css-->", cssString);
 	res.send(preJS.replace("\/\/script.js", jsString));
