@@ -234,9 +234,7 @@ var getStockChart = function(){
 							"<canvas class='pnfChart' id='" + tickerSymb + "Chart' width='300' height='" + chartHeight + "'></canvas></div>");
 			$("#testBox").val("");
 			var canvas = $("#" + tickerSymb + "Chart")[0];
-			canvas.getContext && webkitRequestAnimationFrame(function() {
-				createChart(canvas.getContext("2d"), JSON.parse(data), priceRange, chartHeight);
-			});
+			canvas.getContext && createChart(canvas.getContext("2d"), JSON.parse(data), priceRange, chartHeight);
 		}
 	});
 };

@@ -8,9 +8,11 @@ app.use(express.logger());
 // Function getDateRange returns a string with a defined (60-day) date range in
 // the proper format for the ichart.yahoo.com API.
 var getDateRange = function() {
+	var DAYSBACK = 61;
+	var ONEDAYINMS = 1000 * 60 * 60 * 24;
 	var todayms = new Date();
-	var today = new Date(todayms - (1000 * 60 * 60 * 24));
-	var startDate = new Date(todayms - (1000 * 60 * 60 * 24 * 61));
+	var today = new Date(todayms - ONEDAYINMS);
+	var startDate = new Date(todayms - (ONEDAYINMS * DAYSBACK));
 	var a = "&a=" + startDate.getMonth();
 	var b = "&b=" + startDate.getDate();
 	var c = "&c=" + startDate.getFullYear();
@@ -47,7 +49,7 @@ app.post("/stock?", express.bodyParser(), function(req, res) {
 		// [opening price for first day of range, closing price for same,
 		//  high and low prices for all days to last day of range]
 		var stockArray = stockPrices.slice(8).filter(function(val, key) {
-			return (((key % 6) === 0) || ((key % 6) === 1));
+			return ((key % 6) === 0) || ((key % 6) === 1);
 		}).map(function(val, key) {
 			return parseFloat(val);
 		}).reverse();
