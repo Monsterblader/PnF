@@ -1,6 +1,7 @@
 var express = require("express");
 var fs = require("fs");
 var request = require("request");
+var mime = require("mime");
 
 var app = express();
 app.use(express.logger());
@@ -22,19 +23,6 @@ var getDateRange = function() {
 	return a + b + c + d + e + f;
 };
 
-var readFSCallback = function(err, data) {
-	return err ? console.log(err) : data;
-};
-
-// Function initPage handles the code necessary to set up the page on its
-// initial load.
-var initPage = function(req, res) {
-	var webPage = fs.readFileSync("index.html", "utf8", readFSCallback);
-	res.set("Content-type", "text/html");
-	res.send(webPage);
-	return true;
-};
-
 var getCompanyInformation = function(chunk) {
 	var companyInformation = {};
 	var REGEX = /^[^<]+/;
@@ -52,31 +40,36 @@ var getCompanyInformation = function(chunk) {
 	return companyInformation;
 };
 
+var readFSCallback = function(err, data) {
+	return err ? console.log(err) : data;
+};
+
+// Function initPage handles the code necessary to set up the page on its
+// initial load.
+var initPage = function(req, res) {
+	var webPage = fs.readFileSync("index.html", "utf8", readFSCallback);
+	res.set("Content-type", "text/html");
+	res.send(webPage);
+	return true;
+};
+
+var routes = {
+	"/script.js": "assets/js/script.js",
+	"/style.css": "assets/style/style.css",
+	"/bootstrap.min.css": "assets/bootstrap/css/bootstrap.min.css",
+	"/bootstrap-responsive.min.css": "assets/bootstrap/css/bootstrap-responsive.min.css"
+};
+
 app.get('/', initPage);
 
-app.get('/script.js', function(req, res) {
-	var scr = fs.readFileSync("assets/js/script.js", "utf8", readFSCallback);
-	res.set("Content-type", "text/javascript");
-	res.send(scr);
-});
-
-app.get('/style.css', function(req, res) {
-	var sty = fs.readFileSync("assets/style/style.css", "utf8", readFSCallback);
-	res.set("Content-type", "text/css");
-	res.send(sty);
-});
-
-app.get('/bootstrap.min.css', function(req, res) {
-	var sty = fs.readFileSync("assets/bootstrap/css/bootstrap.min.css", "utf8", readFSCallback);
-	res.set("Content-type", "text/css");
-	res.send(sty);
-});
-
-app.get('/bootstrap-responsive.min.css', function(req, res) {
-	var sty = fs.readFileSync("assets/bootstrap/css/bootstrap-responsive.min.css", "utf8", readFSCallback);
-	res.set("Content-type", "text/css");
-	res.send(sty);
-});
+for (var i in routes) {
+	app.get(i, function(req, res) {
+		var path = routes[req.route.path];
+		var asset = fs.readFileSync(path, "utf8", readFSCallback);
+		res.set("Content-type", mime.lookup(path));
+		res.send(asset);
+	});
+}
 
 app.post("/ichart?", express.bodyParser(), function(req, res) {
 	// TODO if time of request after market close, use today's date, else use yesterday's date.
