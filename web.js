@@ -29,11 +29,8 @@ var readFSCallback = function(err, data) {
 // Function initPage handles the code necessary to set up the page on its
 // initial load.
 var initPage = function(req, res) {
-	var cssString = fs.readFileSync("assets/style/style.css", "utf8", readFSCallback);
-	var jsString = fs.readFileSync("assets/js/script.js", "utf8", readFSCallback);
 	var webPage = fs.readFileSync("index.html", "utf8", readFSCallback);
-	var preJS = webPage.replace("<!--style.css-->", cssString);
-	res.send(preJS.replace("\/\/script.js", jsString));
+	res.send(webPage);
 	return true;
 };
 
@@ -55,6 +52,18 @@ var getCompanyInformation = function(chunk) {
 };
 
 app.get('/', initPage);
+
+app.get('/assets/js/script.js', function(req, res) {
+	var scr = fs.readFileSync("assets/js/script.js", "utf8", readFSCallback);
+	res.set("Content-type", "text/javascript");
+	res.send(scr);
+});
+
+app.get('/assets/style/style.css', function(req, res) {
+	var sty = fs.readFileSync("assets/style/style.css", "utf8", readFSCallback);
+	res.set("Content-type", "text/css");
+	res.send(sty);
+});
 
 app.post("/ichart?", express.bodyParser(), function(req, res) {
 	// TODO if time of request after market close, use today's date, else use yesterday's date.
