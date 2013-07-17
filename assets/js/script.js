@@ -220,30 +220,40 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 	ctx.restore();
 };
 
-var getStockChart = function(){
+var getStockChart = function() {
+	var drawStockChart = function(data) {
+		var priceRange = findRange(JSON.parse(data));
+		var chartHeight = Math.max(300, Math.min(30, diffRangeSum(PnFDiff(priceRange.high, priceRange.low))) * 10);
+		$("#chartContainer").remove();
+		$("#container").append("<div id='chartContainer'><br><div class='chartTitle'>" + tickerSymb.toUpperCase() + "</div>" +
+						"<canvas class='pnfChart' id='" + tickerSymb + "Chart' width='300' height='" + chartHeight + "'></canvas></div>");
+		$("#testBox").val("");
+		var canvas = $("#" + tickerSymb + "Chart")[0];
+		canvas.getContext && createChart(canvas.getContext("2d"), JSON.parse(data), priceRange, chartHeight);
+	};
+
+	var getCompanyInformation = function(data) {
+		var results = JSON.parse(data);
+		console.log(results);
+		$(".name").html(results.name);
+		$(".marketCap").html(results.marketCap);
+		$(".ptoe").html(results.PtoE);
+		$(".eps").html(results.EPS);
+		$(".dandy").html(results.DivandYield);
+	};
+
 	var tickerSymb = $("#testBox").val();
 	$.ajax({
 		url: "ichart?" + tickerSymb,
 		type: "POST",
 		data: {ichart: tickerSymb},
-		success: function(data) {
-			var priceRange = findRange(JSON.parse(data));
-			var chartHeight = Math.max(300, Math.min(30, diffRangeSum(PnFDiff(priceRange.high, priceRange.low))) * 10);
-			$("#chartContainer").remove();
-			$("#container").append("<div id='chartContainer'><br><div class='chartTitle'>" + tickerSymb.toUpperCase() + "</div>" +
-							"<canvas class='pnfChart' id='" + tickerSymb + "Chart' width='300' height='" + chartHeight + "'></canvas></div>");
-			$("#testBox").val("");
-			var canvas = $("#" + tickerSymb + "Chart")[0];
-			canvas.getContext && createChart(canvas.getContext("2d"), JSON.parse(data), priceRange, chartHeight);
-		}
+		success: drawStockChart
 	});
 	$.ajax({
 		url: "finance?" + tickerSymb,
 		type: "POST",
 		data: {finance: tickerSymb},
-		success: function(data) {
-			console.log(JSON.parse(data).name);
-		}
+		success: getCompanyInformation
 	});
 };
 
