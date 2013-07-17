@@ -30,6 +30,7 @@ var readFSCallback = function(err, data) {
 // initial load.
 var initPage = function(req, res) {
 	var webPage = fs.readFileSync("index.html", "utf8", readFSCallback);
+	res.set("Content-type", "text/html");
 	res.send(webPage);
 	return true;
 };
@@ -53,14 +54,26 @@ var getCompanyInformation = function(chunk) {
 
 app.get('/', initPage);
 
-app.get('/assets/js/script.js', function(req, res) {
+app.get('/script.js', function(req, res) {
 	var scr = fs.readFileSync("assets/js/script.js", "utf8", readFSCallback);
 	res.set("Content-type", "text/javascript");
 	res.send(scr);
 });
 
-app.get('/assets/style/style.css', function(req, res) {
+app.get('/style.css', function(req, res) {
 	var sty = fs.readFileSync("assets/style/style.css", "utf8", readFSCallback);
+	res.set("Content-type", "text/css");
+	res.send(sty);
+});
+
+app.get('/bootstrap.min.css', function(req, res) {
+	var sty = fs.readFileSync("assets/bootstrap/css/bootstrap.min.css", "utf8", readFSCallback);
+	res.set("Content-type", "text/css");
+	res.send(sty);
+});
+
+app.get('/bootstrap-responsive.min.css', function(req, res) {
+	var sty = fs.readFileSync("assets/bootstrap/css/bootstrap-responsive.min.css", "utf8", readFSCallback);
 	res.set("Content-type", "text/css");
 	res.send(sty);
 });
