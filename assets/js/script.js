@@ -223,9 +223,9 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 var getStockChart = function(){
 	var tickerSymb = $("#testBox").val();
 	$.ajax({
-		url: "stock?" + tickerSymb,
+		url: "ichart?" + tickerSymb,
 		type: "POST",
-		data: {stock: tickerSymb},
+		data: {ichart: tickerSymb},
 		success: function(data) {
 			var priceRange = findRange(JSON.parse(data));
 			var chartHeight = Math.max(300, Math.min(30, diffRangeSum(PnFDiff(priceRange.high, priceRange.low))) * 10);
@@ -235,6 +235,14 @@ var getStockChart = function(){
 			$("#testBox").val("");
 			var canvas = $("#" + tickerSymb + "Chart")[0];
 			canvas.getContext && createChart(canvas.getContext("2d"), JSON.parse(data), priceRange, chartHeight);
+		}
+	});
+	$.ajax({
+		url: "finance?" + tickerSymb,
+		type: "POST",
+		data: {finance: tickerSymb},
+		success: function(data) {
+			console.log(JSON.parse(data).name);
 		}
 	});
 };
