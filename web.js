@@ -37,11 +37,28 @@ var initPage = function(req, res) {
 	return true;
 };
 
+var getCompanyInformation = function(chunk) {
+	var companyInformation = {};
+	var REGEX = /^[^<]+/;
+	var companyKeys = ["name", "marketCap", "PtoE", "EPS", "DivandYield"];
+	var searchValues = ['class=\"title\"><h2>', "Market Cap:</th>", "P/E ", "EPS ", "Yield:"];
+	var startOffsets = [18, 68, 70, 70, 39];
+	var endOffsets = [100, 88, 80, 80, 59];
+	var nameIndex;
+	var result;
+	for (var i = 0; i < 5; i += 1) {
+		nameIndex = chunk.search(searchValues[i]);
+		result = chunk.slice(nameIndex + startOffsets[i], nameIndex + endOffsets[i]);
+		companyInformation[companyKeys[i]] = REGEX.exec(result)[0];
+	}
+	return companyInformation;
+};
+
 app.get('/', initPage);
 
-app.post("/stock?", express.bodyParser(), function(req, res) {
+app.post("/ichart?", express.bodyParser(), function(req, res) {
 	// TODO if time of request after market close, use today's date, else use yesterday's date.
-	var chartReq = "http://ichart.yahoo.com/table.csv?s=" + req.body.stock + getDateRange() + "&g=d&ignore=.csv";
+	var chartReq = "http://ichart.yahoo.com/table.csv?s=" + req.body.ichart + getDateRange() + "&g=d&ignore=.csv";
 	request(chartReq, function(err, response, body) {
 		var stockPrices = body.split(",");
 		// The following section takes the historic stock-price data from
@@ -57,6 +74,13 @@ app.post("/stock?", express.bodyParser(), function(req, res) {
 		stockArray.unshift(stockPrices[stockPrices.length - 6]);
 		// End of section.
 		res.send(JSON.stringify(stockArray));
+	});
+});
+
+app.post("/finance?", express.bodyParser(), function(req, res) {
+	var companyInformationReq = "http://finance.yahoo.com/q?s=" + req.body.finance + "&ql=1";
+	request(companyInformationReq, function(err, response, body) {
+		res.send(JSON.stringify(getCompanyInformation(body)));
 	});
 });
 
