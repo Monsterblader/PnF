@@ -99,6 +99,11 @@ app.post("/finance?", express.bodyParser(), function(req, res) {
 	});
 });
 
+app.post("/random", express.bodyParser(), function(req, res) {
+	var stock = JSON.parse(fs.readFileSync("assets/companyList.txt", "utf8", readFSCallback));
+	res.send(stock[Math.floor(Math.random() * stock.length)].Symbol);
+});
+
 var port = process.env.PORT || 5000;
 app.listen(port, function() {
   console.log("Listening on " + port);

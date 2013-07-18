@@ -220,7 +220,7 @@ var createChart = function (ctx, prices, priceRange, chartHeight){
 	ctx.restore();
 };
 
-var getStockChart = function() {
+var getStockChart = function(random) {
 	var drawStockChart = function(data) {
 		var priceRange = findRange(JSON.parse(data));
 		var chartHeight = Math.max(300, Math.min(30, diffRangeSum(PnFDiff(priceRange.high, priceRange.low))) * 10);
@@ -241,7 +241,7 @@ var getStockChart = function() {
 		$(".dandy").html(results.DivandYield);
 	};
 
-	var tickerSymb = $("#testBox").val();
+	var tickerSymb = random ? random : $("#testBox").val();
 	$.ajax({
 		url: "ichart?" + tickerSymb,
 		type: "POST",
@@ -253,6 +253,17 @@ var getStockChart = function() {
 		type: "POST",
 		data: {finance: tickerSymb},
 		success: getCompanyInformation
+	});
+};
+
+var getRandomChart = function() {
+	$.ajax({
+		url: "random",
+		type: "POST",
+		data: {stock: "random"},
+		success: function(data) {
+			getStockChart(data);
+		}
 	});
 };
 
