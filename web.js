@@ -99,12 +99,9 @@ app.post("/finance?", express.bodyParser(), function(req, res) {
 	});
 });
 
-var companyList = fs.readFileSync("assets/companyList.txt", "utf8", readFSCallback);
-
 app.post("/random", express.bodyParser(), function(req, res) {
-	var stock = JSON.parse(companyList);
-	var stockObj = {tSymb: stock[Math.floor(Math.random() * stock.length)].Symbol};
-	res.send(JSON.stringify(stockObj));
+	var stock = JSON.parse(fs.readFileSync("assets/companyList.txt", "utf8", readFSCallback));
+	res.send(stock[Math.floor(Math.random() * stock.length)].Symbol);
 });
 
 var port = process.env.PORT || 5000;
