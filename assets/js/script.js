@@ -262,7 +262,7 @@ var getRandomChart = function() {
 		type: "POST",
 		data: {stock: "random"},
 		success: function(data) {
-			getStockChart(data);
+			getStockChart(JSON.parse(data));
 		}
 	});
 };
