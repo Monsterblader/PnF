@@ -47,7 +47,7 @@ var readFSCallback = function(err, data) {
 // Function initPage handles the code necessary to set up the page on its
 // initial load.
 var initPage = function(req, res) {
-	var webPage = fs.readFileSync("index.html", "utf8", readFSCallback);
+	var webPage = fs.readFileSync("assets/html/index.html", "utf8", readFSCallback);
 	res.set("Content-type", "text/html");
 	res.send(webPage);
 	return true;

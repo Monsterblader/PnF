@@ -234,7 +234,6 @@ var getStockChart = function() {
 
 	var getCompanyInformation = function(data) {
 		var results = JSON.parse(data);
-		console.log(results);
 		$(".name").html(results.name);
 		$(".marketCap").html(results.marketCap);
 		$(".ptoe").html(results.PtoE);
