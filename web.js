@@ -59,23 +59,14 @@ var initPage = function(req, res) {
 	return true;
 };
 
-var routes = {
-	"/script.js": "assets/js/script.js",
-	"/style.css": "assets/style/style.css",
-	"/bootstrap.min.css": "assets/bootstrap/css/bootstrap.min.css",
-	"/bootstrap-responsive.min.css": "assets/bootstrap/css/bootstrap-responsive.min.css"
-};
-
 app.get('/', initPage);
 
-for (var i in routes) {
-	app.get(i, function(req, res) {
-		var path = routes[req.route.path];
-		var asset = fs.readFileSync(path, "utf8", readFSCallback);
-		res.set("Content-type", mime.lookup(path));
-		res.send(asset);
-	});
-}
+app.get('/assets?', function(req, res) {
+	var path = "assets/" + req.query.route;
+	var asset = fs.readFileSync(path, "utf8", readFSCallback);
+	res.set("Content-type", mime.lookup(path));
+	res.send(asset);
+});
 
 app.post("/ichart?", express.bodyParser(), function(req, res) {
 	// TODO if time of request after market close, use today's date, else use yesterday's date.
