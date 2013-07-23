@@ -241,19 +241,25 @@ var getStockChart = function(random) {
 		$(".dandy").html(results.DivandYield);
 	};
 
-	var tickerSymb = random ? random : $("#testBox").val();
+	var tickerSymb = random || $("#testBox").val();
 	if (tickerSymb) {
-	$.ajax({
-		url: "ichart?" + tickerSymb,
-		type: "POST",
-		data: {ichart: tickerSymb},
-		success: drawStockChart
-	});
-	$.ajax({
-		url: "finance?" + tickerSymb,
-		type: "POST",
-		data: {finance: tickerSymb},
-		success: getCompanyInformation
+		$.ajax({
+			url: "ichart?" + tickerSymb,
+			type: "POST",
+			data: {ichart: tickerSymb},
+			success: function(data) {
+				if (data !== "--Failed--") {
+					drawStockChart(data);
+				} else {
+					alert("Sorry.  I did not recognize that symbol.");
+				}
+			}
+		});
+		$.ajax({
+			url: "finance?" + tickerSymb,
+			type: "POST",
+			data: {finance: tickerSymb},
+			success: getCompanyInformation
 		});
 	}
 };
