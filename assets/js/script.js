@@ -242,6 +242,7 @@ var getStockChart = function(random) {
 	};
 
 	var tickerSymb = random ? random : $("#testBox").val();
+	if (tickerSymb) {
 	$.ajax({
 		url: "ichart?" + tickerSymb,
 		type: "POST",
@@ -253,7 +254,8 @@ var getStockChart = function(random) {
 		type: "POST",
 		data: {finance: tickerSymb},
 		success: getCompanyInformation
-	});
+		});
+	}
 };
 
 var getRandomChart = function() {
